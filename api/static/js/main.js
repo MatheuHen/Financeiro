@@ -1,5 +1,7 @@
 // JavaScript para o sistema de extração de NF-e
 
+// Agente 3 - Consulta RAG (via backend Python)
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[NF-e] JavaScript carregado com sucesso!');
     
@@ -523,4 +525,70 @@ document.addEventListener('DOMContentLoaded', function() {
             maximumFractionDigits: 2
         });
     }
+
+    // Funções para Consulta RAG (backend Python)
+
+    // Função para realizar consulta RAG
+    window.realizarConsultaRAG = function() {
+        const pergunta = document.getElementById('pergunta-rag').value.trim();
+        const tipoRag = document.getElementById('tipo-rag') ? document.getElementById('tipo-rag').value : 'simples';
+        const resultadoDiv = document.getElementById('resultado-rag');
+        const botaoConsultar = document.getElementById('btn-consultar-rag');
+
+        if (!pergunta) {
+            resultadoDiv.innerHTML = '<div class="alert alert-warning">Por favor, digite uma pergunta.</div>';
+            return;
+        }
+
+        // Desabilita botão durante consulta
+        botaoConsultar.disabled = true;
+        botaoConsultar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Consultando...';
+        resultadoDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Processando consulta...</div>';
+
+        // Chamada ao backend
+        fetch('/consulta-rag/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ pergunta: pergunta, tipo_rag: tipoRag })
+        })
+        .then(async (response) => {
+            let payload;
+            try { payload = await response.json(); } catch (e) { throw new Error('Resposta inválida do servidor'); }
+            if (!response.ok || payload.error) {
+                const msg = payload.error || 'Falha na consulta RAG';
+                const details = payload.details ? `\nDetalhes: ${payload.details}` : '';
+                throw new Error(msg + details);
+            }
+            return payload;
+        })
+        .then(data => {
+            if (data && data.resposta) {
+                resultadoDiv.innerHTML = `
+                    <div class="rag-response">
+                        <div class="response-header">
+                            <h5><i class="fas fa-brain"></i> Resposta do Agente 03</h5>
+                            <small class="text-muted">Modalidade: ${data.tipo_rag || tipoRag} | Confiança: ${data.confianca}% | Fontes: ${data.fontes}</small>
+                        </div>
+                        <div class="response-content">
+                            ${data.resposta}
+                        </div>
+                        ${data.mensagem ? `<div class="mt-2"><small class="text-muted">${data.mensagem}</small></div>` : ''}
+                    </div>
+                `;
+            } else {
+                resultadoDiv.innerHTML = '<div class="alert alert-danger">Erro ao processar consulta: ' + (data && data.error ? data.error : 'Erro desconhecido') + '</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Erro na consulta RAG:', error);
+            resultadoDiv.innerHTML = '<div class="alert alert-danger">' + (error && error.message ? error.message : 'Erro ao conectar com o servidor') + '</div>';
+        })
+        .finally(() => {
+            botaoConsultar.disabled = false;
+            botaoConsultar.innerHTML = '<i class="fas fa-search"></i> Consultar';
+        });
+    };
 });

@@ -116,3 +116,33 @@ body {
         font-size: 1.25rem;
     }
 }
+
+/* Estilos para RAG Response */
+.rag-response {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid #ffc107;
+}
+
+.response-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.response-header h5 {
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.response-content {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #212529;
+}
+
+#pergunta-rag {
+    resize: vertical;
+    min-height: 100px;
+}

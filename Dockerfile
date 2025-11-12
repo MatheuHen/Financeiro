@@ -22,17 +22,12 @@ COPY . .
 # Cria o diretório para arquivos estáticos
 RUN mkdir -p /app/staticfiles
 
-# Coleta arquivos estáticos
-RUN python manage.py collectstatic --noinput
-
-# Executa as migrações do banco de dados
-RUN python manage.py migrate
-
-# Cria dados iniciais
-RUN python manage.py setup_inicial
+# Copia entrypoint para execução de tarefas em runtime
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Expõe a porta 8000
 EXPOSE 8000
 
-# Comando para iniciar a aplicação
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Comando/entrypoint para iniciar a aplicação e executar tarefas de runtime
+ENTRYPOINT ["/app/entrypoint.sh"]

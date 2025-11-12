@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import upload_nfe, health_check, exemplo_json, index, redirecionar_menu
+from .views import upload_nfe, health_check, exemplo_json, index, redirecionar_menu, consultar_rag
 from .gerenciamento_views import (
     menu_principal, gerenciar_cadastros,
     listar_pessoas, atualizar_pessoa, alterar_status_pessoa,
@@ -39,4 +39,7 @@ urlpatterns = [
     path('upload/', upload_nfe, name='upload_nfe'),
     path('health/', health_check, name='health_check'),
     path('exemplo/', exemplo_json, name='exemplo_json'),
+    
+    # Rota do Agente 3 - Consulta RAG
+    path('consulta-rag/', consultar_rag, name='consultar_rag'),
 ]

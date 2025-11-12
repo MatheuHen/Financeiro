@@ -67,6 +67,13 @@
                                         <i class="fas fa-database"></i> Agente 02 - Banco de Dados
                                     </button>
                                 </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="agente03-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#agente03" type="button" role="tab" 
+                                            aria-controls="agente03" aria-selected="false">
+                                        <i class="fas fa-brain"></i> Agente 03 - Consulta RAG
+                                    </button>
+                                </li>
                             </ul>
 
                             <div class="tab-content" id="mainTabsContent">
@@ -180,6 +187,70 @@
                                             <!-- Mensagem de sucesso -->
                                             <div id="success-message" class="alert alert-success" style="display: none;">
                                                 <h6><i class="fas fa-check-circle"></i> Registro lançado com sucesso.</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Aba Agente 03 - Consulta RAG -->
+                                <div class="tab-pane fade" id="agente03" role="tabpanel" 
+                                     aria-labelledby="agente03-tab">
+                                    <div class="card mt-3">
+                                        <div class="card-header bg-warning text-dark">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-brain"></i>
+                                                Consulta Inteligente com RAG
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="pergunta-rag" class="form-label">
+                                                            <strong>Digite sua pergunta sobre os dados financeiros:</strong>
+                                                        </label>
+                                                        <textarea class="form-control" id="pergunta-rag" rows="3" 
+                                                                  placeholder="Ex: Qual foi o total de vendas do mês passado? Quais são os principais fornecedores? Qual o valor médio das notas fiscais?"
+                                                                  required></textarea>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="tipo-rag" class="form-label"><strong>Modalidade de RAG</strong></label>
+                                                        <select id="tipo-rag" class="form-select">
+                                                            <option value="simples" selected>RAG Simples</option>
+                                                            <option value="embeddings">RAG com Embeddings</option>
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="d-grid gap-2">
+                                                        <button type="button" class="btn btn-warning btn-lg" 
+                                                                id="btn-consultar-rag" onclick="realizarConsultaRAG()">
+                                                                <i class="fas fa-search"></i>
+                                                                Consultar
+                                                            </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-4">
+                                                <div class="col-md-12">
+                                                    <div class="card">
+                                                        <div class="card-header bg-light">
+                                                            <h6 class="mb-0">
+                                                                <i class="fas fa-robot"></i>
+                                                                Resultado da Consulta
+                                                            </h6>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div id="resultado-rag">
+                                                                <div class="text-muted text-center">
+                                                                    <i class="fas fa-info-circle"></i>
+                                                                    Digite uma pergunta acima e clique em "Consultar" para obter uma resposta inteligente baseada nos dados do banco.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
