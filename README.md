@@ -138,18 +138,3 @@ O sistema gera logs detalhados de todas as operações:
 3. Commit suas mudanças
 4. Push para a branch
 5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-- Abra uma issue no GitHub
-- Consulte os logs do sistema
-- Verifique a documentação da API em `/admin`
-
----
-
-**Sistema FINANCEIRO** - Automatização completa para processamento de NFe 🚀
