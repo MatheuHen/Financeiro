@@ -1,4 +1,4 @@
-version: '3.8'
+name: financeiro-master
 
 services:
   web:
@@ -10,12 +10,14 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     environment:
+      - PORT=8000
       - DEBUG=1
       - SECRET_KEY=django-insecure-!0)_0s7*0u4u9z8yr(mm$$^qt$$mrvran(ej9z-te!(m0-yi=d7
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     env_file:
       - .env
     command: python manage.py runserver 0.0.0.0:8000 --noreload
+    restart: unless-stopped
 
 volumes:
   static_volume:

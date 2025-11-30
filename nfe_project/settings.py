@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
 
 # Carrega as variáveis do arquivo .env
@@ -68,12 +69,29 @@ WSGI_APPLICATION = 'nfe_project.wsgi.application'
 
 # Database
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+_db_url = os.getenv('DATABASE_URL', '').strip()
+if _db_url:
+    _u = urlparse(_db_url)
+    _q = parse_qs(_u.query)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _u.path.lstrip('/'),
+            'USER': _u.username or '',
+            'PASSWORD': _u.password or '',
+            'HOST': _u.hostname or '',
+            'PORT': str(_u.port or ''),
+            'CONN_MAX_AGE': 600,
+            'OPTIONS': {'sslmode': _q.get('sslmode', ['require'])[0]}
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation

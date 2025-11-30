@@ -139,9 +139,30 @@ def consultar_despesa(descricao):
             
         logger.info(f"Classificação não encontrada: {descricao}")
         return False, None
-        
     except Exception as e:
         logger.error(f"Erro ao consultar classificação: {e}")
+        return False, None
+
+
+def consultar_receita(descricao):
+    """
+    Consulta se uma classificação de receita existe
+    """
+    try:
+        if not descricao or not descricao.strip():
+            return False, None
+        classificacao = Classificacao.objects.filter(
+            descricao__iexact=descricao.strip(),
+            tipo='RECEITA',
+            ativo=True
+        ).first()
+        if classificacao:
+            logger.info(f"Classificação RECEITA encontrada: {classificacao.descricao} (ID: {classificacao.id})")
+            return True, classificacao.id
+        logger.info(f"Classificação RECEITA não encontrada: {descricao}")
+        return False, None
+    except Exception as e:
+        logger.error(f"Erro ao consultar classificação RECEITA: {e}")
         return False, None
 
 
@@ -239,6 +260,26 @@ def criar_despesa(descricao):
         
     except Exception as e:
         logger.error(f"Erro ao criar classificação: {e}")
+        return None
+
+
+def criar_receita(descricao):
+    """
+    Cria uma nova classificação de receita
+    """
+    try:
+        if not descricao or not descricao.strip():
+            logger.error("Descrição da classificação de receita é obrigatória")
+            return None
+        classificacao = Classificacao.objects.create(
+            descricao=descricao.strip(),
+            tipo='RECEITA',
+            ativo=True
+        )
+        logger.info(f"Classificação RECEITA criada: {classificacao.descricao} (ID: {classificacao.id})")
+        return classificacao.id
+    except Exception as e:
+        logger.error(f"Erro ao criar classificação RECEITA: {e}")
         return None
 
 
@@ -441,6 +482,7 @@ def processar_nfe_completo(dados_extraidos):
         nome_faturado = faturado_data.get('nome', '')
         cpf_faturado = faturado_data.get('cpf', '')
         classificacao_despesa = nf_data.get('classificacao_despesa', '')
+        classificacao_receita = nf_data.get('classificacao_receita', '')
         
         # 1. Consultar fornecedor
         fornecedor_existe, fornecedor_id = consultar_fornecedor(nome_fornecedor, cnpj_fornecedor)
@@ -450,6 +492,7 @@ def processar_nfe_completo(dados_extraidos):
         
         # 3. Consultar classificação de despesa
         despesa_existe, despesa_id = consultar_despesa(classificacao_despesa)
+        receita_existe, receita_id = consultar_receita(classificacao_receita)
         
         # Resultado das consultas
         consultas = {
@@ -469,6 +512,11 @@ def processar_nfe_completo(dados_extraidos):
                 "descricao": classificacao_despesa,
                 "existe": despesa_existe,
                 "id": despesa_id
+            },
+            "receita": {
+                "descricao": classificacao_receita,
+                "existe": receita_existe,
+                "id": receita_id
             }
         }
         
@@ -500,7 +548,7 @@ def processar_nfe_completo(dados_extraidos):
                 consultas["faturado"]["existe"] = True
                 
         # Criar classificação se não existe
-        if not despesa_existe:
+        if not despesa_existe and classificacao_despesa:
             despesa_id = criar_despesa(classificacao_despesa)
             if despesa_id:
                 registros_criados["despesa_criada"] = True
@@ -517,10 +565,11 @@ def processar_nfe_completo(dados_extraidos):
             mensagem_erro = "Não foi possível identificar ou criar o fornecedor. Verifique se os dados do fornecedor estão legíveis na NFe."
         elif not faturado_id:
             mensagem_erro = "Não foi possível identificar ou criar o faturado. Verifique se os dados do destinatário estão legíveis na NFe."
-        elif not despesa_id:
-            mensagem_erro = "Não foi possível identificar a classificação da despesa."
+        elif not despesa_id and not receita_id:
+            mensagem_erro = "Não foi possível identificar a classificação (despesa/receita)."
         else:
-            movimento_id = registrar_movimento(fornecedor_id, faturado_id, despesa_id, nf_data)
+            classificacao_escolhida = despesa_id or receita_id
+            movimento_id = registrar_movimento(fornecedor_id, faturado_id, classificacao_escolhida, nf_data)
             if movimento_id:
                 registros_criados["movimento_criado"] = True
                 registros_criados["movimento_id"] = movimento_id
@@ -551,3 +600,10 @@ def processar_nfe_completo(dados_extraidos):
             "registros_criados": {},
             "mensagem_erro": f"Erro no processamento: {str(e)}"
         }
+        if not receita_existe and classificacao_receita:
+            receita_id = criar_receita(classificacao_receita)
+            if receita_id:
+                registros_criados["receita_criada"] = True
+                registros_criados["receita_id"] = receita_id
+                consultas["receita"]["id"] = receita_id
+                consultas["receita"]["existe"] = True

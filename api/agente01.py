@@ -271,6 +271,10 @@ def ensure_required_shape(data, raw_json_text=None):
 
     valor_total = normalize_money(nf.get('valor_total')) or (f"{total_calc:.2f}" if total_calc > 0 else '')
     classificacao = classify_expense(produtos_out, nf.get('classificacao_despesa'), texto_ocr)
+    # Receita: se vier do modelo, repassar; senão, manter vazio
+    classificacao_receita = (nf.get('classificacao_receita') or '').strip()
+    # Tipo de conta: RECEBER se há receita, caso contrário PAGAR
+    tipo_conta = 'RECEBER' if classificacao_receita else 'PAGAR'
     if not classificacao or not str(classificacao).strip():
         # Fallback simples para nunca deixar vazio caso o modelo não preencha
         classificacao = 'ADMINISTRATIVAS'
@@ -285,7 +289,9 @@ def ensure_required_shape(data, raw_json_text=None):
             'produtos': produtos_out,
             'parcelas': parcelas_out,
             'valor_total': valor_total,
-            'classificacao_despesa': classificacao
+            'classificacao_despesa': classificacao,
+            'classificacao_receita': classificacao_receita,
+            'tipo_conta': tipo_conta
         }
     }
 
