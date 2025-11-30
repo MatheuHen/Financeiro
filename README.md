@@ -1,140 +1,180 @@
-# FINANCEIRO - Sistema de Extração e Processamento de NFe
+FINANCEIRO — Sistema de Extração e Processamento de NF-e
 
-Sistema completo para extração de dados de Notas Fiscais Eletrônicas (NFe) e processamento automático no banco de dados financeiro.
+Este projeto é um sistema completo para extrair dados de Notas Fiscais (PDF ou imagem), processar automaticamente as informações e consultar tudo via RAG (inteligência artificial contextualizada no banco).
+É uma solução pensada para automatizar rotinas de contas a pagar/receber, organizando fornecedores, faturados, classificações e movimentações financeiras.
 
-## 🚀 Funcionalidades
+🚀 Funcionalidades Principais
+🔹 Agente 01 — Extração da NF-e
 
-### Agente 01 - Extração de Dados
-- Extração automática de dados de NFe (XML/PDF)
-- Identificação de fornecedor, cliente e produtos
-- Normalização de valores monetários
-- Cálculo automático de totais e parcelas
+Responsável por interpretar a nota fiscal (PDF/JPG/PNG) usando IA (Gemini):
 
-### Agente 02 - Processamento no Banco
-- Criação automática de fornecedores e clientes
-- Registro de movimentos financeiros
-- Geração de parcelas de pagamento
-- Classificação automática de despesas
+Identifica fornecedor, faturado, produtos, parcelas e totais
 
-## 🛠️ Tecnologias
+Normaliza valores
 
-- **Backend**: Django + Django REST Framework
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **IA**: Google Gemini para extração de dados
-- **Banco de Dados**: SQLite (desenvolvimento) / PostgreSQL (produção)
-- **Containerização**: Docker + Docker Compose
+Entende respostas estruturadas em JSON
 
-## 📋 Pré-requisitos
+Classifica automaticamente DESPESA/RECEITA
 
-- Docker
-- Docker Compose
-- Git
+Determina se a conta é PAGAR ou RECEBER
 
-## 🚀 Como Executar
+🔹 Agente 02 — Processamento
 
-### 1. Clone o repositório
-```bash
-git clone <url-do-repositorio>
-cd FINANCEIRO
-```
+A partir dos dados extraídos:
 
-### 2. Execute com Docker Compose
-```bash
-docker-compose up
-```
+Cria fornecedor/cliente se não existirem
 
-### 3. Acesse o sistema
-Após a inicialização, acesse:
-- **Sistema Web**: [http://localhost:8000](http://localhost:8000)
-- **Admin Django**: [http://localhost:8000/admin](http://localhost:8000/admin)
+Consulta ou cria classificações (Receita/Despesa)
 
-## 📁 Estrutura do Projeto
+Registra o movimento financeiro
 
-```
-FINANCEIRO/
-├── api/                    # Backend Django
-│   ├── agente01.py        # Extração de dados NFe
-│   ├── agente02.py        # Processamento banco de dados
-│   ├── models.py          # Modelos do banco
-│   ├── views.py           # APIs REST
-│   └── static/            # Arquivos estáticos
-├── docker-compose.yml     # Configuração Docker
-├── Dockerfile            # Imagem Docker
-└── requirements.txt      # Dependências Python
-```
+Registra parcelas
 
-## 🔧 Configuração
+Armazena os produtos em itens_json
 
-### Variáveis de Ambiente
-Crie um arquivo `.env` na raiz do projeto:
+Suporta múltiplas classificações na mesma conta
 
-```env
-DJANGO_SECRET_KEY=sua-chave-secreta
-GEMINI_API_KEY=sua-chave-gemini
-DEBUG=True
-```
+🔹 Agente 03 — RAG (Consulta Inteligente)
 
-### Banco de Dados
-O sistema criará automaticamente as tabelas necessárias na primeira execução.
+Permite fazer perguntas sobre o banco de dados usando IA:
 
-## 📊 Como Usar
+RAG Simples (palavras-chave)
 
-1. **Acesse o sistema** em http://localhost:8000
-2. **Selecione a aba** desejada:
-   - **Agente 01**: Para extrair dados de NFe
-   - **Agente 02**: Para consultar dados salvos
-3. **Faça upload** de uma NFe (XML ou PDF)
-4. **Visualize os dados** extraídos
-5. **Confirme o salvamento** no banco de dados
+RAG por Embeddings (similaridade semântica)
 
-## 🔍 Funcionalidades Detalhadas
+Respostas elaboradas com contexto real do sistema
 
-### Interface com Abas
-- **Agente 01**: Extração e visualização de dados
-- **Agente 02**: Consulta de dados existentes no banco
-- **Confirmação**: Sistema pergunta antes de salvar novos dados
+🛠️ Tecnologias Utilizadas
 
-### Dados Extraídos
-- **Fornecedor**: Nome, CNPJ, endereço
-- **Cliente**: Nome, CPF/CNPJ
-- **Produtos**: Descrição, quantidade, valor unitário, valor total
-- **Parcelas**: Número, valor, data de vencimento
+Backend: Django 5 + Django REST Framework
 
-### Processamento Automático
-- Criação de fornecedores e clientes (se não existirem)
-- Registro de movimentos financeiros
-- Geração automática de parcelas
-- Classificação de despesas
+Frontend: HTML, Bootstrap e JavaScript puro
 
-## 🐛 Solução de Problemas
+IA: Google Gemini
 
-### Container não inicia
-```bash
-docker-compose down
-docker-compose up --build
-```
+Banco: SQLite (desenvolvimento) / PostgreSQL (produção)
 
-### Erro de permissão
-```bash
-sudo docker-compose up
-```
+Contêiner: Docker + Docker Compose
 
-### Logs do sistema
-```bash
-docker-compose logs -f
-```
+Serviço estático e deploy: suporte a WhiteNoise e Nginx
 
-## 📝 Logs e Monitoramento
+📦 Como rodar em Desenvolvimento (Docker)
+git clone https://github.com/MatheuHen/Financeiro
+cd Financeiro
+docker compose -f "docker-compose.dev.yml" up -d --remove-orphans
 
-O sistema gera logs detalhados de todas as operações:
-- Extração de dados (Agente 01)
-- Processamento no banco (Agente 02)
-- Erros e exceções
 
-## 🤝 Contribuição
+Acesse:
 
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+Sistema → http://localhost:8000
+
+Admin → http://localhost:8000/admin
+
+Health → http://localhost:8000/health/
+
+🌐 Acesso em Produção (Deploy Render)
+
+O sistema já está publicado e pode ser acessado diretamente pelo link:
+
+👉 https://financeiro-ajcb.onrender.com/menu/
+
+Rotas principais no ambiente de produção:
+
+Menu principal:
+https://financeiro-ajcb.onrender.com/menu/
+
+Extração de NF-e:
+https://financeiro-ajcb.onrender.com/extracao/
+
+Cadastros (Pessoas, Classificações, Movimentos):
+https://financeiro-ajcb.onrender.com/gerenciar/
+
+Health Check (status do sistema):
+https://financeiro-ajcb.onrender.com/health/
+
+🗂️ Estrutura do Projeto (resumo)
+api/
+ ├── agente01.py            # Extração da NF-e (IA)
+ ├── agente02.py            # Processamento e persistência
+ ├── agente03.py            # RAG (Simples + Embeddings)
+ ├── views.py               # Rotas principais e health check
+ ├── gerenciamento_views.py # UI de cadastros
+ ├── models.py              # Pessoas, Classificação, Movimento, Parcelas
+ ├── templates/             # HTML do sistema
+ └── static/                # CSS/JS
+nfe_project/                # settings, urls e wsgi
+docker-compose.dev.yml
+docker-compose.yml
+Dockerfile
+entrypoint.sh
+requirements.txt
+scripts/seed.sqlite.sql     # Base com +200 registros
+
+🧩 Regras de Interface
+
+Tabelas começam vazias
+
+Dados só aparecem ao clicar Buscar ou Todos
+
+“Todos” → traz apenas registros ATIVOS
+
+Ordenação por coluna
+
+Suporte a busca por múltiplos campos
+
+Editar / Excluir (exclusão lógica → INATIVO)
+
+CREATE/UPDATE não mostram campo de status
+
+🧠 Detalhes da Extração
+
+O sistema obtém automaticamente:
+
+Fornecedor (razão social, CNPJ)
+
+Faturado (nome, CPF)
+
+Número, série, data e total da nota
+
+Itens da nota (descrição, quantidades e valores)
+
+Parcelas (datas e valores)
+
+Tipo da movimentação (Receita/Despesa, Pagar/Receber)
+
+🔍 RAG — Perguntas Inteligentes
+
+Você pode perguntar coisas como:
+
+"Quanto já gastei com manutenção este mês?"
+
+"Quais fornecedores foram usados em outubro?"
+
+"Liste as notas classificadas como despesa de operação"
+
+O RAG usa embeddings e contexto real do banco.
+
+🛠️ Solução de Problemas Comuns
+
+Container não inicia
+
+docker compose -f "docker-compose.dev.yml" down
+docker compose -f "docker-compose.dev.yml" up -d --remove-orphans
+
+
+Erro: “no such table: api_pessoas”
+→ Configure DJANGO_DB_RUN=1 e reinicie.
+
+Gemini não responde
+→ Falta GEMINI_API_KEY.
+
+📡 Monitoramento
+
+Health: /health/
+
+Logs locais:
+
+docker compose -f "docker-compose.dev.yml" logs -f
+
+
+Logs do servidor (Render): painel → Logs
