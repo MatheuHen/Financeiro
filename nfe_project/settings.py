@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!0)_0s7*0u4u9z8yr(mm$^qt#$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['*', 'financeiro-ajcb.onrender.com']
 
 
 # Application definição
@@ -154,6 +154,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+]
+
+# CSRF trusted origins para produção (Render)
+CSRF_TRUSTED_ORIGINS = [
+    'https://financeiro-ajcb.onrender.com',
 ]
 
 # Configurações de upload de arquivos
